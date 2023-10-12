@@ -1,0 +1,104 @@
+import random
+
+class Card:
+    def __init__(self, rank, suit):
+        self.rank = rank
+        self.suit = suit
+    def __repr__(self):
+        return (f'{self.rank} of {self.suit}')
+class Deck:
+    def __init__(self) -> None:
+        number_pack = range(2, 11)
+        face_pack = ['Jack', 'Queen', 'King', 'Ace']
+        suits = ['Clubs', 'Hearts', 'Diamonds', 'Spades']
+        self.deck = []
+        for suit in suits:
+            for number in number_pack:
+                self.deck.append(Card(number, suit))
+            for face in face_pack:
+                self.deck.append(Card(face, suit))
+    def draw(self):
+        return self.deck.pop(0)
+    def shuffle(self):
+        random.shuffle(self.deck)
+    def __repr__(self) -> str:
+        return str(self.deck)
+
+def total(hand: list[Card]): 
+    sum = 0
+    ace_count = 0
+    for card in hand:
+        if card.rank in ['Jack','Queen', 'King']:
+            sum+=10
+        elif card.rank != 'Ace':
+            sum+=int(card.rank)
+        else:
+            ace_count+=1
+    for _ in range(ace_count):
+        sum+=11 if sum+11<=21 else 1
+    return sum
+
+
+
+while True:
+    bust = False
+    deck = Deck()
+    deck.shuffle()
+    dealer_hand = []
+    player_hand = []
+    player_hand.append(deck.draw())
+    dealer_hand.append(deck.draw())
+    player_hand.append(deck.draw())
+    dealer_hand.append(deck.draw())
+    def dealerLn():
+        print(f'Dealer has {dealer_hand[0]}')
+    def printLn(hand):
+        print(f'The hand is {hand}, the total is {total(hand)}')
+
+    dealerLn()
+    printLn(player_hand)
+    if total(player_hand) == 21:
+        print('BLACKJACK!')
+        if total(dealer_hand) == 21:
+            print('DOUBLE BLACKJACK! DRAW!')
+        else:
+            print('You Won!!')
+            choice = input('Would you like to play again? (y/n)').lower()
+            if choice == 'n':
+                break
+        continue
+    if total(dealer_hand) == 21:
+        print('Dealer Blackjack! You lost!')
+        choice = input('Would you like to play again? (y/n)').lower()
+        if choice == 'n':
+            break
+        continue
+    answer = ''
+    while answer != 's':
+        answer = input('Would you like to [H]it or [S]tand?').lower()
+        if answer == 'h':
+            player_hand.append(deck.draw())
+            printLn(player_hand)
+        if total(player_hand) > 21:
+            bust = True
+            print('You lost!!')
+            break
+
+    print(f'Dealer has {dealer_hand}, their total is {total(dealer_hand)}')
+    while total(dealer_hand) < 17:
+        dealer_hand.append(deck.draw())
+        printLn(dealer_hand)
+        if total(dealer_hand) > 21:
+            bust = True
+            print('Player you won!!!')
+    if not bust:
+        if total(player_hand) > total(dealer_hand):
+            print('Player you won!!!')
+        elif total(player_hand) == total(dealer_hand):
+            print('It is a Draw!')
+        else:
+            print('You lost!!')
+
+    choice = input('Would you like to play again? (y/n)').lower()
+    if choice == 'n':
+        break
